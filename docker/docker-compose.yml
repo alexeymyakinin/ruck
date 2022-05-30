@@ -1,0 +1,3 @@
+services:
+  db-postgres:
+    image: postgres:13-alpine
