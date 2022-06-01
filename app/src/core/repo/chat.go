@@ -1,65 +1,65 @@
 package repo
 
 import (
+	"app/src/core/helper"
+	"app/src/core/model"
 	"context"
 	"database/sql"
-
-	"app/src/core/model"
 	"github.com/jmoiron/sqlx"
-
-	"github.com/rs/zerolog/log"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 type ChatRepository struct {
-	db *sqlx.DB
+	db  *sqlx.DB
+	log echo.Logger
 }
 
-func NewChatRepository(pool *sqlx.DB) *ChatRepository {
-	return &ChatRepository{
-		db: pool,
-	}
+func NewChatRepository(db *sqlx.DB, log echo.Logger) *ChatRepository {
+	return &ChatRepository{db, log}
 }
 
-func (r *ChatRepository) Insert(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
-	txx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelDefault,
-		ReadOnly:  false,
-	})
+func (cr *ChatRepository) Insert(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
+	tx, err := cr.db.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelDefault})
 	if err != nil {
-		log.Error().Err(err).Msg("ChatRepository:Insert cannot begin transaction")
+		cr.log.Error(err)
 		return nil, err
 	}
 
-	qry := `INSERT INTO "chat"."chat" ("name") VALUES ($1) RETURNING "id"`
-	row := txx.QueryRow(qry)
-	defer func() { _ = txx.Rollback() }()
+	param := []any{chat.Name}
+	query := `INSERT INTO "chat"."chat" ("name") VALUES ($1) RETURNING "id"`
+
+	row := tx.QueryRow(query, param...)
+	defer func() { _ = tx.Rollback() }()
 
 	if err := row.Scan(chat.ID); err != nil {
-		log.Error().Err(err).Str("query", qry).Msg("ChatRepository:Insert cannot scan")
+		cr.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		cr.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
 		return nil, err
 	}
 
 	return chat, nil
 }
 
-func (r *ChatRepository) SelectWhereId(ctx context.Context, id uint64) (*model.Chat, error) {
-	txx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelDefault,
-		ReadOnly:  false,
-	})
+func (cr *ChatRepository) SelectWhereId(ctx context.Context, chatId uint64) (*model.Chat, error) {
+	tx, err := cr.db.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelDefault, ReadOnly: true})
 	if err != nil {
-		log.Error().Err(err).Msg("ChatRepository:SelectWhereId cannot begin transaction")
+		cr.log.Error(err)
 		return nil, err
 	}
 
-	var dest model.Chat
-	qry := `SELECT * FROM "chat"."chat" WHERE "id" = $1`
-	row := txx.QueryRowx(qry, id)
-	defer func() { _ = txx.Rollback() }()
+	param := []any{chatId}
+	query := `SELECT * FROM "chat"."chat" WHERE "id" = $1`
+	row := tx.QueryRowx(query, param...)
+	defer func() { _ = tx.Rollback() }()
 
+	var dest model.Chat
 	if err := row.StructScan(&dest); err != nil {
-		log.Error().Err(err).Str("query", qry).Msg("ChatRepository:SelectWhereId cannot scan")
-		return nil, err
+		cr.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
+		return nil, helper.HandleRepoErr(err)
 	}
 
 	return &dest, nil

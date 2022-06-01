@@ -1,45 +1,45 @@
 package handler
 
 import (
+	"app/src/api/http/schema"
+	"app/src/core/dep"
+	"app/src/core/helper"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
-
-	"app/src/api/http/schema"
-	"app/src/core/dep"
-	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c echo.Context) error {
-	svc := dep.Dep.UserService()
-
-	req, err := schema.GetUserCreateRequest(c)
+	var user schema.UserCreateRequest
+	err := c.Bind(&user)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, schema.NewError(err, "cannot parse body"))
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, "cannot parse body")
 	}
 
-	res, err := svc.CreateUser(c.Request().Context(), req)
+	ctx := c.Request().Context()
+	svc := dep.GetUserService()
+	res, err := svc.CreateUser(ctx, &user)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, schema.NewError(err, ""))
+		return helper.HandleServiceErr(err)
 	}
+
 	return c.JSON(http.StatusCreated, &res)
-
 }
 
-func GetUserByID(c echo.Context) error {
-	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+func GetUser(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, &gin.H{"error": "id is not uint64"})
+		return echo.NewHTTPError(
+			http.StatusBadRequest,
+			echo.NewBindingError("id", c.ParamValues(), "cannot parse id", err),
+		)
 	}
 
-	svc := dep.Dep.UserService()
-	usr, err := svc.GetUserByID(c.Request().Context(), userID)
+	ctx := c.Request().Context()
+	svc := dep.GetUserService()
+	usr, err := svc.GetUser(ctx, id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, &gin.H{"error": "unknown error"})
-	}
-
-	if usr == nil {
-		return c.JSON(http.StatusNotFound, &gin.H{"error": "user not found"})
+		return helper.HandleServiceErr(err)
 	}
 
 	return c.JSON(http.StatusOK, usr)

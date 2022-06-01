@@ -1,15 +1,21 @@
 package schema
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/url"
 )
 
+const (
+	UserOffline UserOnlineStatus = "offline"
+)
+
 type (
+	UserOnlineStatus string
+
 	UserSimpleResponse struct {
-		ID       uint64   `json:"id"`
-		Username string   `json:"username"`
-		ImageURL *url.URL `json:"imageURL"`
+		ID           uint64           `json:"id"`
+		Username     string           `json:"username"`
+		ImageURL     *url.URL         `json:"imageURL"`
+		OnlineStatus UserOnlineStatus `json:"onlineStatus"`
 	}
 
 	UserDetailResponse struct {
@@ -25,24 +31,21 @@ type (
 	}
 
 	UserCreateResponse struct {
-		User *UserDetailResponse `json:"user"`
+		ID       uint64   `json:"id"`
+		Username string   `json:"username"`
+		ImageURL *url.URL `json:"imageURL"`
 	}
 )
 
-func NewUserSimpleResponse(id uint64, username string, imageURL *url.URL) *UserSimpleResponse {
-	return &UserSimpleResponse{ID: id, Username: username, ImageURL: imageURL}
-}
-
-func NewUserDetailResponse(id uint64, username string, imageURL *url.URL) *UserDetailResponse {
-	return &UserDetailResponse{ID: id, Username: username, ImageURL: imageURL}
-}
-
-func GetUserCreateRequest(c echo.Context) (*UserCreateRequest, error) {
-	var req UserCreateRequest
-	err := c.Bind(&req)
-
-	if err != nil {
-		return nil, err
+func NewUserSimpleResponse(id uint64, username string, imageURL *url.URL, status UserOnlineStatus) *UserSimpleResponse {
+	return &UserSimpleResponse{
+		ID:           id,
+		Username:     username,
+		ImageURL:     imageURL,
+		OnlineStatus: status,
 	}
-	return &req, nil
+}
+
+func NewUserCreateResponse(id uint64, username string, imageURL *url.URL) *UserCreateResponse {
+	return &UserCreateResponse{id, username, imageURL}
 }

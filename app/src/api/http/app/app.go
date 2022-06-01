@@ -8,6 +8,8 @@ import (
 
 func NewApplication() *echo.Echo {
 	e := echo.New()
+	e.HidePort = true
+	e.HideBanner = true
 	e.Use(
 		middleware.RequestID(),
 		middleware.Recover(),
@@ -15,11 +17,12 @@ func NewApplication() *echo.Echo {
 	)
 
 	{
+		e.POST("/api/v1/chat", handler.CreateChat)
 		e.GET("/api/v1/chat/:id", handler.GetChat)
 	}
 	{
 		e.POST("/api/v1/user", handler.CreateUser)
-		e.GET("/api/v1/user/:id", handler.GetUserByID)
+		e.GET("/api/v1/user/:id", handler.GetUser)
 	}
 
 	return e
