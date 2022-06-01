@@ -6,7 +6,7 @@ type (
 		Name string
 	}
 
-	ChatAccount struct {
+	ChatUser struct {
 		ID      uint64
 		Chat    uint64
 		Account uint64

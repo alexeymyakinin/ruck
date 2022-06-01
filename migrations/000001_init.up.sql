@@ -1,36 +1,37 @@
-create table account
-(
-    id       bigserial primary key,
-    email    varchar(255) not null,
-    username varchar(255) not null,
-    password varchar      not null
-);
-create unique index account_email_uix on account (email);
-create unique index account_username_uix on account (username);
+CREATE SCHEMA "chat";
 
-create table chat
+CREATE TABLE "chat"."user"
 (
-    id   bigserial primary key,
-    name varchar(255) not null
+    "id"       BIGSERIAL PRIMARY KEY,
+    "email"    VARCHAR(255) NOT NULL,
+    "username" VARCHAR(255) NOT NULL,
+    "password" VARCHAR      NOT NULL
+);
+CREATE UNIQUE INDEX "user_email_uix" ON "chat"."user" ("email");
+CREATE UNIQUE INDEX "user_username_uix" ON "chat"."user" ("username");
+
+CREATE TABLE "chat"."chat"
+(
+    "id"   BIGSERIAL PRIMARY KEY,
+    "name" VARCHAR(255) NOT NULL
 );
 
-create table chat_account
+CREATE TABLE "chat"."chat_user"
 (
-    id      bigserial primary key,
-    chat    bigint not null references chat (id),
-    account bigint not null references account (id)
+    "id"   BIGSERIAL PRIMARY KEY,
+    "chat" BIGINT NOT NULL REFERENCES "chat"."chat" ("id"),
+    "user" BIGINT NOT NULL REFERENCES "chat"."user" ("id")
 );
-create index chat_account_chat_ix on chat_account (chat);
-create index chat_account_account_ix on chat_account (account);
+CREATE INDEX "chat_user_chat_ix" ON "chat"."chat_user" ("chat");
+CREATE INDEX "chat_user_user_ix" ON "chat"."chat_user" ("user");
 
-create table chat_message
+CREATE TABLE "chat"."chat_message"
 (
-    id        bigserial primary key,
-    text      varchar(255),
-    chat      bigint    not null references chat (id),
-    sender    bigint    not null references account (id),
-    timestamp timestamp not null default current_timestamp
+    "id"        BIGSERIAL PRIMARY KEY,
+    "text"      VARCHAR(255),
+    "chat"      BIGINT    NOT NULL REFERENCES "chat"."chat" ("id"),
+    "sender"    BIGINT    NOT NULL REFERENCES "chat"."user" ("id"),
+    "timestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-create index chat_message_chat_ix on chat_message (chat);
-create index chat_message_sender_ix on chat_message (sender);
-
+CREATE INDEX "chat_message_chat_ix" ON "chat"."chat_message" ("chat");
+CREATE INDEX "chat_message_sender_ix" ON "chat"."chat_message" ("sender");

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"app/src/api/http/app"
 	"app/src/core/cfg"
-	"app/src/web/http/app"
 )
 
 func init() {
