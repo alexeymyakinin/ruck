@@ -14,7 +14,7 @@ func init() {
 
 func main() {
 	srv := app.NewApplication()
-	err := srv.Run(fmt.Sprintf("%s:%s", cfg.Config.AppHost, cfg.Config.AppPort))
+	err := srv.Start(fmt.Sprintf("%s:%s", cfg.Config.AppHost, cfg.Config.AppPort))
 	if err != nil {
 		log.Fatal(err)
 	}

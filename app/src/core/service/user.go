@@ -20,9 +20,7 @@ func NewUserService(repo *repo.UserRepository) *UserService {
 	}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, user *schema.UserCreateRequest) (
-	*schema.UserCreateResponse, error,
-) {
+func (s *UserService) CreateUser(ctx context.Context, user *schema.UserCreateRequest) (*schema.UserCreateResponse, error) {
 	pwd, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error().Err(err).Msg("UserService:CreateUser cannot get password hash")

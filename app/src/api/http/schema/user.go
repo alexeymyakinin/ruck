@@ -1,9 +1,8 @@
 package schema
 
 import (
+	"github.com/labstack/echo/v4"
 	"net/url"
-
-	"github.com/gin-gonic/gin"
 )
 
 type (
@@ -38,9 +37,9 @@ func NewUserDetailResponse(id uint64, username string, imageURL *url.URL) *UserD
 	return &UserDetailResponse{ID: id, Username: username, ImageURL: imageURL}
 }
 
-func GetUserCreateRequest(c *gin.Context) (*UserCreateRequest, error) {
+func GetUserCreateRequest(c echo.Context) (*UserCreateRequest, error) {
 	var req UserCreateRequest
-	err := c.BindJSON(&req)
+	err := c.Bind(&req)
 
 	if err != nil {
 		return nil, err
