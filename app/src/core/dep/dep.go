@@ -1,7 +1,7 @@
 package dep
 
 import (
-	"app/src/core/cfg"
+	"app/src/core/env"
 	"app/src/core/repo"
 	"app/src/core/service"
 	"github.com/jmoiron/sqlx"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	db = sqlx.MustOpen("postgres", cfg.Config.DBConnectionURL)
+	db = sqlx.MustOpen("postgres", env.DBConnectionURL)
 )
 
 func logger(prefix string) echo.Logger {

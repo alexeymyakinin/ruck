@@ -8,8 +8,8 @@ import (
 
 func NewApplication() *echo.Echo {
 	e := echo.New()
-	e.HidePort = true
-	e.HideBanner = true
+	//e.HidePort = true
+	//e.HideBanner = true
 	e.Use(
 		middleware.RequestID(),
 		middleware.Recover(),
