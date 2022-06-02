@@ -1,9 +1,9 @@
 package dep
 
 import (
-	"app/src/core/env"
-	"app/src/core/repo"
-	"app/src/core/service"
+	"github.com/alexeymyakinin/ruck/app/src/core/env"
+	"github.com/alexeymyakinin/ruck/app/src/core/repo"
+	"github.com/alexeymyakinin/ruck/app/src/core/service"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"

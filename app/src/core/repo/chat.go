@@ -1,10 +1,10 @@
 package repo
 
 import (
-	"app/src/core/helper"
-	"app/src/core/model"
 	"context"
 	"database/sql"
+	"github.com/alexeymyakinin/ruck/app/src/core/helper"
+	"github.com/alexeymyakinin/ruck/app/src/core/model"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -59,7 +59,7 @@ func (cr *ChatRepository) SelectWhereId(ctx context.Context, chatId uint64) (*mo
 	var dest model.Chat
 	if err := row.StructScan(&dest); err != nil {
 		cr.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
-		return nil, helper.HandleRepoErr(err)
+		return nil, helper.ParseError(err)
 	}
 
 	return &dest, nil

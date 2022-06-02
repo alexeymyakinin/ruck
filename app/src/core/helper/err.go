@@ -9,7 +9,7 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
-func HandleRepoErr(err error) error {
+func ParseError(err error) error {
 	switch err {
 	default:
 		return err
@@ -18,7 +18,7 @@ func HandleRepoErr(err error) error {
 	}
 }
 
-func HandleServiceErr(err error) *echo.HTTPError {
+func GetHTTPError(err error) *echo.HTTPError {
 	switch err {
 	default:
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

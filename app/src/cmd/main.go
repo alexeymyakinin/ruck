@@ -1,11 +1,10 @@
 package main
 
 import (
-	"app/src/core/env"
 	"fmt"
+	"github.com/alexeymyakinin/ruck/app/src/api/http/app"
+	"github.com/alexeymyakinin/ruck/app/src/core/env"
 	"log"
-
-	"app/src/api/http/app"
 )
 
 func init() {

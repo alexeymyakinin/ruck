@@ -10,6 +10,7 @@ const (
 
 type (
 	UserOnlineStatus string
+	UserDTO          map[string]any
 
 	UserSimpleResponse struct {
 		ID           uint64           `json:"id"`
@@ -31,9 +32,8 @@ type (
 	}
 
 	UserCreateResponse struct {
-		ID       uint64   `json:"id"`
-		Username string   `json:"username"`
-		ImageURL *url.URL `json:"imageURL"`
+		ID       uint64 `json:"id"`
+		Username string `json:"username"`
 	}
 )
 
@@ -46,6 +46,6 @@ func NewUserSimpleResponse(id uint64, username string, imageURL *url.URL, status
 	}
 }
 
-func NewUserCreateResponse(id uint64, username string, imageURL *url.URL) *UserCreateResponse {
-	return &UserCreateResponse{id, username, imageURL}
+func NewUserCreateResponse(id uint64, username string) *UserCreateResponse {
+	return &UserCreateResponse{id, username}
 }

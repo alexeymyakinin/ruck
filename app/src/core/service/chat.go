@@ -1,10 +1,10 @@
 package service
 
 import (
-	"app/src/api/http/schema"
-	"app/src/core/model"
-	"app/src/core/repo"
 	"context"
+	"github.com/alexeymyakinin/ruck/app/src/api/http/schema"
+	"github.com/alexeymyakinin/ruck/app/src/core/model"
+	"github.com/alexeymyakinin/ruck/app/src/core/repo"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,23 +20,23 @@ func NewChatService(repo *repo.ChatRepository, log echo.Logger) *ChatService {
 	}
 }
 
-func (cs *ChatService) CreateChat(ctx context.Context, chat *schema.ChatCreateRequest) (*schema.ChatCreateResponse, error) {
+func (cs *ChatService) CreateChat(ctx context.Context, chat *schema.ChatCreateRequest) (*model.Chat, error) {
 	res, err := cs.repo.Insert(ctx, &model.Chat{Name: chat.Name})
 	if err != nil {
 		cs.log.Error(err)
 		return nil, err
 	}
 
-	return schema.NewChatCreateResponse(res.ID, res.Name), nil
+	return res, nil
 }
 
-func (cs *ChatService) GetChat(ctx context.Context, chatId uint64) (*schema.ChatSimpleResponse, error) {
+func (cs *ChatService) GetChat(ctx context.Context, chatId uint64) (*model.Chat, error) {
 	res, err := cs.repo.SelectWhereId(ctx, chatId)
 	if err != nil {
 		cs.log.Error(err)
 		return nil, err
 	}
 
-	return schema.NewChatSimpleResponse(res.ID, res.Name), nil
+	return res, nil
 
 }

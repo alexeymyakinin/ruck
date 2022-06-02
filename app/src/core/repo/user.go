@@ -1,10 +1,10 @@
 package repo
 
 import (
-	"app/src/core/helper"
-	"app/src/core/model"
 	"context"
 	"database/sql"
+	"github.com/alexeymyakinin/ruck/app/src/core/helper"
+	"github.com/alexeymyakinin/ruck/app/src/core/model"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -59,7 +59,28 @@ func (ur *UserRepository) SelectWhereId(ctx context.Context, userId uint64) (*mo
 	var dest model.User
 	if err := row.StructScan(&dest); err != nil {
 		ur.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
-		return nil, helper.HandleRepoErr(err)
+		return nil, helper.ParseError(err)
+	}
+
+	return &dest, nil
+}
+
+func (ur *UserRepository) SelectWhereUsername(ctx context.Context, username string) (*model.User, error) {
+	tx, err := ur.db.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelDefault, ReadOnly: true})
+	if err != nil {
+		ur.log.Error(err)
+		return nil, err
+	}
+
+	param := []any{username}
+	query := `SELECT * FROM "chat"."user" WHERE "username" = $1`
+	row := tx.QueryRowx(query, param...)
+	defer func() { _ = tx.Rollback() }()
+
+	var dest model.User
+	if err := row.StructScan(&dest); err != nil {
+		ur.log.Errorj(log.JSON{"error": err, "query": query, "param": param})
+		return nil, helper.ParseError(err)
 	}
 
 	return &dest, nil

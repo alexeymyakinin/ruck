@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"app/src/api/http/schema"
-	"app/src/core/dep"
-	"app/src/core/helper"
+	"github.com/alexeymyakinin/ruck/app/src/api/http/schema"
+	"github.com/alexeymyakinin/ruck/app/src/core/dep"
+	"github.com/alexeymyakinin/ruck/app/src/core/helper"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -20,10 +20,9 @@ func CreateUser(c echo.Context) error {
 	svc := dep.GetUserService()
 	res, err := svc.CreateUser(ctx, &user)
 	if err != nil {
-		return helper.HandleServiceErr(err)
+		return helper.GetHTTPError(err)
 	}
-
-	return c.JSON(http.StatusCreated, &res)
+	return c.JSON(http.StatusCreated, schema.NewUserCreateResponse(res.ID, res.Username))
 }
 
 func GetUser(c echo.Context) error {
@@ -39,8 +38,8 @@ func GetUser(c echo.Context) error {
 	svc := dep.GetUserService()
 	usr, err := svc.GetUser(ctx, id)
 	if err != nil {
-		return helper.HandleServiceErr(err)
+		return helper.GetHTTPError(err)
 	}
 
-	return c.JSON(http.StatusOK, usr)
+	return c.JSON(http.StatusOK, schema.NewUserSimpleResponse(usr.ID, usr.Username, nil, schema.UserOffline))
 }
